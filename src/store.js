@@ -20,24 +20,14 @@ export const todosState = atom({
   default: [],
 });
 
-export const todosFilterState = atom({
-  key: "TodosFilter",
-  default: "Show All",
-});
-
 export const fileredTodosState = selector({
   key: "FileredTodos",
   get: ({ get }) => {
-    const filter = get(todosFilterState);
-    const list = get(todosState);
+    const todos = get(todosState);
+    const filter = get(searchState);
 
-    switch (filter) {
-      case "Show Completed":
-        return list.filter((item) => item.isComplete);
-      case "Show Uncompleted":
-        return list.filter((item) => !item.isComplete);
-      default:
-        return list;
-    }
+    return todos.filter(
+      (item) => item.title.includes(filter) || item.desc.includes(filter)
+    );
   },
 });

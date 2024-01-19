@@ -6,7 +6,13 @@ import {
   useRecoilState,
   useRecoilValue,
 } from "recoil";
-import { descriptionState, titleState, todosState, searchState } from "./store";
+import {
+  descriptionState,
+  titleState,
+  todosState,
+  searchState,
+  fileredTodosState,
+} from "./store";
 import "./App.css";
 
 export default function App() {
@@ -14,6 +20,7 @@ export default function App() {
   const [desc, setDesc] = useRecoilState(descriptionState);
   const [search, setSearch] = useRecoilState(searchState);
   const [todos, setTodos] = useRecoilState(todosState);
+  const filteredTodosList = useRecoilValue(fileredTodosState);
 
   const addTodoHandler = () => {
     setTodos((prev) => [...prev, { title, desc }]);
@@ -24,6 +31,23 @@ export default function App() {
   const onDeleteHandler = (title) => {
     const filteredTodos = todos.filter((item) => title !== item.title);
     setTodos(filteredTodos);
+  };
+
+  const RenderTodos = ({ todosToRender }) => {
+    return todosToRender.map((item) => (
+      <div key={item.title} className="todo">
+        <div className="todo-text-container">
+          <h3>{item.title}</h3>
+          <h4>{item.desc}</h4>
+        </div>
+        <div
+          onClick={() => onDeleteHandler(item.title)}
+          className="todo-button"
+        >
+          X
+        </div>
+      </div>
+    ));
   };
 
   return (
@@ -50,22 +74,11 @@ export default function App() {
       <button onClick={addTodoHandler} className="main-button">
         Add todo
       </button>
-      {todos.map((item) => {
-        return (
-          <div key={item.title} className="todo">
-            <div className="todo-text-container">
-              <h3>{item.title}</h3>
-              <h4>{item.desc}</h4>
-            </div>
-            <div
-              onClick={() => onDeleteHandler(item.title)}
-              className="todo-button"
-            >
-              X
-            </div>
-          </div>
-        );
-      })}
+      {search === "" ? (
+        <RenderTodos todosToRender={todos} />
+      ) : (
+        <RenderTodos todosToRender={filteredTodosList} />
+      )}
     </div>
   );
 }
